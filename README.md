@@ -1,149 +1,74 @@
-# my-mcp-server
+# Weather MCP Tool for Claude
 
-A Model Context Protocol (MCP) server built with mcp-framework.
+한국어 지원 날씨 정보 조회 MCP(Model Context Protocol) 도구입니다. Claude AI와 함께 사용할 수 있으며, 전 세계 도시의 실시간 날씨 정보를 제공합니다.
 
-## Quick Start
+## Features
+
+- 도시 이름으로 날씨 정보 조회 (한국어/영어 지원)
+- 실시간 기상 데이터 제공
+- 상세한 날씨 정보 (기온, 날씨 상태, 풍속, 풍향, 습도)
+- Claude AI와 원활한 통합
+
+## 사용된 API
+
+- [Open-Meteo Weather API](https://open-meteo.com/)
+- [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api)
+
+## 설치 방법
 
 ```bash
-# Install dependencies
+# 저장소 클론
+git clone https://github.com/yourusername/weather-mcp-tool.git
+cd weather-mcp-tool
+
+# 의존성 설치
 npm install
 
-# Build the project
+# 빌드
 npm run build
-
 ```
 
-## Project Structure
+## Claude Desktop 설정
 
-```
-my-mcp-server/
-├── src/
-│   ├── tools/        # MCP Tools
-│   │   └── ExampleTool.ts
-│   └── index.ts      # Server entry point
-├── package.json
-└── tsconfig.json
-```
+`claude_desktop_config.json` 파일에 다음 설정을 추가하세요:
 
-## Adding Components
-
-The project comes with an example tool in `src/tools/ExampleTool.ts`. You can add more tools using the CLI:
-
-```bash
-# Add a new tool
-mcp add tool my-tool
-
-# Example tools you might create:
-mcp add tool data-processor
-mcp add tool api-client
-mcp add tool file-handler
+```json
+{
+  "mcpServers": {
+    "weather-server": {
+      "command": "node",
+      "args": ["dist/server.js"],
+      "cwd": "프로젝트_경로"
+    }
+  }
+}
 ```
 
-## Tool Development
+## 사용 예시
 
-Example tool structure:
+Claude에서 다음과 같이 사용할 수 있습니다:
 
 ```typescript
-import { MCPTool } from "mcp-framework";
-import { z } from "zod";
-
-interface MyToolInput {
-  message: string;
-}
-
-class MyTool extends MCPTool<MyToolInput> {
-  name = "my_tool";
-  description = "Describes what your tool does";
-
-  schema = {
-    message: {
-      type: z.string(),
-      description: "Description of this input parameter",
-    },
-  };
-
-  async execute(input: MyToolInput) {
-    // Your tool logic here
-    return `Processed: ${input.message}`;
-  }
-}
-
-export default MyTool;
+const result = await weatherApi.execute({
+  city: "서울"
+});
 ```
 
-## Publishing to npm
-
-1. Update your package.json:
-   - Ensure `name` is unique and follows npm naming conventions
-   - Set appropriate `version`
-   - Add `description`, `author`, `license`, etc.
-   - Check `bin` points to the correct entry file
-
-2. Build and test locally:
-   ```bash
-   npm run build
-   npm link
-   my-mcp-server  # Test your CLI locally
-   ```
-
-3. Login to npm (create account if necessary):
-   ```bash
-   npm login
-   ```
-
-4. Publish your package:
-   ```bash
-   npm publish
-   ```
-
-After publishing, users can add it to their claude desktop client (read below) or run it with npx
-```
-
-## Using with Claude Desktop
-
-### Local Development
-
-Add this configuration to your Claude Desktop config file:
-
-**MacOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
-
+응답 예시:
 ```json
 {
-  "mcpServers": {
-    "my-mcp-server": {
-      "command": "node",
-      "args":["/absolute/path/to/my-mcp-server/dist/index.js"]
-    }
+  "city": "Seoul",
+  "country": "South Korea",
+  "weather": {
+    "temperature": 18.5,
+    "description": "맑음",
+    "windSpeed": 2.3,
+    "windDirection": 180,
+    "humidity": 65
   }
 }
 ```
 
-### After Publishing
+## License
 
-Add this configuration to your Claude Desktop config file:
-
-**MacOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "my-mcp-server": {
-      "command": "npx",
-      "args": ["my-mcp-server"]
-    }
-  }
-}
-```
-
-## Building and Testing
-
-1. Make changes to your tools
-2. Run `npm run build` to compile
-3. The server will automatically load your tools on startup
-
-## Learn More
-
-- [MCP Framework Github](https://github.com/QuantGeekDev/mcp-framework)
-- [MCP Framework Docs](https://mcp-framework.com)
+MIT License - 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
